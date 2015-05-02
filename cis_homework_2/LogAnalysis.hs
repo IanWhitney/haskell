@@ -40,7 +40,7 @@ errorParams :: (String, String, String) -> (Int, TimeStamp, String)
 errorParams (a,b,c) = (wordToInteger a,  wordToInteger b, c)
 
 errorCode :: (Int, TimeStamp, String) -> Int
-errorCode (id, _, _) = id
+errorCode (code, _, _) = code
 errorTimeStamp :: (Int, TimeStamp, String) -> TimeStamp
 errorTimeStamp (_, timestamp, _) = timestamp
 errorContent :: (Int, TimeStamp, String) -> String
