@@ -48,3 +48,22 @@ errorContent (_, _, content) = content
 
 wordToInteger :: String -> Int
 wordToInteger n = read n :: Int
+
+parse :: String -> [LogMessage]
+parse s = map parseMessage (lines s)
+
+-- other ways of writing parse
+
+--parse = (map parseMessage) . lines
+-- I don't know why this doesn't need parse s
+  -- maybe you can lave out the input & it's assumed?
+-- (map parseMessage) needs a []
+-- lines provides the []
+--
+-- 
+
+-- parse s = map parseMessage $ lines s
+-- map (function) list -> list
+-- lines s resolves to list
+-- the $ means that lines s resolves first. 
+
