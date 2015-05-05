@@ -142,10 +142,11 @@ build (m:ms) = insert m (build ms)
 
 -- My first pass at Exercise 4
 inOrder :: MessageTree -> [LogMessage]
-inOrder Leaf msg Leaf = [msg]
-inOrder Leaf msg rnode = [msg] ++ (inOrder rnode)
-inOrder lnode msg Leaf = (inOrder lnode) ++ [msg]
-inOrder lnode msg rnode = (inOrder lnode) ++ [msg] ++ (inOrder rnode)
+inOrder (Node Leaf msg Leaf) = [msg]
+inOrder (Node Leaf msg rnode) = [msg] ++ (inOrder rnode)
+inOrder (Node lnode msg Leaf) = (inOrder lnode) ++ [msg]
+inOrder (Node lnode msg rnode) = (inOrder lnode) ++ [msg] ++ (inOrder rnode)
+inOrder _ = []
 
 -- Given a tree like  (L 2 (L 3 L) 4 ((L 4.5 L) 5 L) this function resolves to
 -- inOrder (L 2 (L 3 L) 4 ((L 4.5 L) 5 L)
