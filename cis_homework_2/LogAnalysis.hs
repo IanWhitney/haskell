@@ -173,3 +173,21 @@ inOrder _ = []
 --  [] ++ [2] ++ [] ++ [3] ++ [] ++ [4] ++ [] ++ [4.5] ++ [] ++ [5] ++ []
 --
 --  Both functions end up working the same. The reference solution is shorter, but results in a lot of empty arrays being concatenated. Mine is longer, but has fewer cycles and empty arrays. The 'right' solution may be a matter of preference?
+--
+--
+severeMessage :: LogMessage -> Bool
+severeMessage (LogMessage (Error severity) _ _ ) = severity >= 50
+severeMessage _ = False
+
+messageContent :: LogMessage -> String
+messageContent (LogMessage _ _ content) = content
+messageContent _ = ""
+
+gatherMessages :: [LogMessage] -> [String]
+gatherMessages messages = map (messageContent) messages
+
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong messages = gatherMessages (filter severeMessage (inOrder (build messages)))
+
+twww :: IO [String]
+twww = testWhatWentWrong parse whatWentWrong "sample.log"
