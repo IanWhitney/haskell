@@ -134,3 +134,40 @@ insert msg(LogMessage _ msgTimeStamp _) node@(Node leftNode treeMessage@(LogMess
   | msgTimeStamp > treeTimeStamp = Node leftNode treeMessage (insert msg rightNode)
   | msgTimeStamp == treeTimeStamp = node
 
+build :: [LogMessage] -> MessageTree
+build [] = Leaf
+build [m] = Node Leaf m Leaf
+build [m:ms] = insert m (build ms)
+
+-- My first pass at Exercise 4
+inOrder :: MessageTree -> [LogMessage]
+inOrder Leaf msg Leaf = [msg]
+inOrder Leaf msg rnode = [msg] ++ (inOrder rnode)
+inOrder lnode msg Leaf = (inOrder lnode) ++ [msg]
+inOrder lnode msg rnode = (inOrder lnode) ++ [msg] ++ (inOrder rnode)
+
+-- Given a tree like  (L 2 (L 3 L) 4 ((L 4.5 L) 5 L) this function resolves to
+-- inOrder (L 2 (L 3 L) 4 ((L 4.5 L) 5 L)
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ inOrder ((L 4.5 L) 5 L)
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ (inOrder L 4.5 L) ++ [5]
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ [4.5] ++ [5]
+--  = [2] ++ inOrder (L 3 L) ++ [4] ++ [4.5] ++ [5]
+--  = [2] ++ [3] ++ [4] ++ [4.5] ++ [5]
+--  = [2, 3, 4, 4.5, 5]
+
+-- Reference solution for Exercise 4
+-- inOrder :: MessageTree -> [LogMessage]
+-- inOrder Leaf = []
+-- inOrder (Node ltree msg rtree) = inOrder ltree ++ [msg] ++ inOrder rtree
+
+-- Given a tree like  (L 2 (L 3 L) 4 ((L 4.5 L) 5 L) this function resolves to
+-- inOrder (L 2 (L 3 L) 4 ((L 4.5 L) 5 L)
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ inOrder ((L 4.5 L) 5 L))
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ inOrder (inOrder (L 4.5 L) + [5] + inOrder (L)))
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ inOrder (inOrder (L 4.5 L) + [5] + []))
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ inOrder (inOrder (inOrder (L) ++ [4.5] ++ inOrder (L)) ++ [5] ++ []))
+--  = inOrder (L 2 (L 3 L)) ++ [4] ++ [] ++ [4.5] ++ [] ++ [5] ++ []
+--  ... and so on until
+--  [] ++ [2] ++ [] ++ [3] ++ [] ++ [4] ++ [] ++ [4.5] ++ [] ++ [5] ++ []
+--
+--  Both functions end up working the same. The reference solution is shorter, but results in a lot of empty arrays being concatenated. Mine is longer, but has fewer cycles and empty arrays. The 'right' solution may be a matter of preference?
