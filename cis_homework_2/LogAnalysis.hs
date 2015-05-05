@@ -128,12 +128,12 @@ parse s = map parseMessage (lines s)
 --
 --So, my function should be
 insert :: LogMessage -> MessageTree -> MessageTree
-insert (Unknown _) tree = tree
-insert logMessage (Leaf) = Node Leaf logMessage Leaf
-insert msg(LogMessage _ msgTimeStamp _) node@(Node leftNode treeMessage@(LogMessage _ treeTimeStamp _) rightNode)
-  | msgTimeStamp < treeTimeStamp = Node (insert msg leftNode) treeMessage rightNode
-  | msgTimeStamp > treeTimeStamp = Node leftNode treeMessage (insert msg rightNode)
-  | msgTimeStamp == treeTimeStamp = node
+insert msg Leaf = Node Leaf msg Leaf
+insert msg@(LogMessage _ msgTime _) node@(Node ltree l@(LogMessage _ treeTime _) rtree)
+  | msgTime < treeTime = Node (insert msg ltree) l rtree 
+  | msgTime > treeTime = Node ltree l (insert msg rtree)
+  | msgTime == treeTime = node
+insert _ t = t
 
 build :: [LogMessage] -> MessageTree
 build [] = Leaf
