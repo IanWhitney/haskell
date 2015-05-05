@@ -65,5 +65,72 @@ parse s = map parseMessage (lines s)
 -- parse s = map parseMessage $ lines s
 -- map (function) list -> list
 -- lines s resolves to list
--- the $ means that lines s resolves first. 
+-- the $ means that lines s resolves first.
+
+theTimestamp :: LogMessage -> TimeStamp
+theTimestamp (LogMessage _ t _) = t
+theTimestamp (Unknown _ ) = 0
+
+nodeMessage :: MessageTree -> LogMessage
+nodeMessage (Node _ l _) = l
+nodeMessage _ = Unknown ""
+
+leftNode :: MessageTree -> MessageTree
+leftNode (Node left _ _ ) = left
+
+rightNode :: MessageTree -> MessageTree
+rightNode (Node _ _ right ) = right
+
+-- This was my first pass at the function, which was wrong.
+-- insert :: LogMessage -> MessageTree -> MessageTree
+-- insert (Unknown _) tree = tree
+-- insert logMessage (Leaf) = Node Leaf logMessage Leaf
+-- insert logMessage node
+  -- | (theTimestamp logMessage) < (theTimestamp (nodeMessage node)) = insert logMessage (leftNode node)
+  -- | (theTimestamp logMessage) > (theTimestamp (nodeMessage node)) = insert logMessage (rightNode node)
+  -- | (theTimestamp logMessage) == (theTimestamp (nodeMessage node)) = node
+
+-- insert (Unknown _) t = t
+-- insert msg Leaf = Node Leaf msg Leaf
+-- insert msg(LogMessage _ msgTime _) (Node ltree l@(LogMessage _ treeTime _) rtree)
+--   | msgTime <= treeTime = Node (insert msg ltree) l rtree
+--   | msgTime > treeTime = Node ltree l (insert msg rtree)
+--
+--   wrapping msg() around the first param lets us refer to msg later.
+--    So when we create a node, you don't have to do something like my nodeMessage function
+--   This function doesn't handle equality the same way I do, but the homework doesn't say how to do equality.
+--   This function takes advantage of naming within the pattern match, which I forgot about.
+--   Taking this example and mine, I'd probably now write
+--
+-- insert (Unknown _) tree = tree
+-- insert logMessage (Leaf) = Node Leaf logMessage Leaf
+-- insert msg(LogMessage _ msgTimeStamp _) node@(Node leftNode treeMessage@(LogMessage _ treeTimeStamp _) rightNode)
+  -- | msgTimeStamp < treeTimeStamp = insert msg leftNode
+  -- | msgTimeStamp logMessage > treeTimeStamp = insert msg rightNode
+  -- | msgTimeStamp == treeTimeStamp = node
+  --
+-- My function also builds the tree wrong. 
+-- insert (LogMessage _ 3 _ ) (Node (Node Leaf LogMessage _ 2 _ Leaf)  LogMessage _ 4 _ (Node Leaf LogMessage _ 5 _ Leaf))
+--  = insert (LogMessage _ 3 _) (Node Leaf LogMessage _ 2 _ Leaf) 
+--    = insert (LogMessage _ 3 _) (Leaf)
+--      = Node Leaf (LogMessage _ 3 _) Leaf
+--
+-- And that's wrog. We lose the original tree entirely.
+--
+-- The example solution would owkr like this
+-- insert (LogMessage _ 3 _ ) (Node (Node Leaf LogMessage _ 2 _ Leaf)  LogMessage _ 4 _ (Node Leaf LogMessage _ 5 _ Leaf))
+--  = Node (insert (LogMessage _ 3 _) (Node Leaf LogMessage _ 2 _ Leaf)) LogMessage _ 4 _ (Node Leaf LogMessage _ 5 _ Leaf)
+--    = Node (Node (insert (LogMessage _ 3 _) Leaf) LogMessage _ 2_ Leaf ) LogMessage _ 4 _ (Node Leaf LogMessage _ 5 _ Leaf)
+--       = Node (Node (Node Leaf (LogMessage _ 3 _) Leaf) LogMessage _2_ Leaf) LogMessage _ 4 _ (Node Leaf LogMessage _5 _ Leaf)
+--
+-- which returns the full tree
+--
+--So, my function should be
+insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) tree = tree
+insert logMessage (Leaf) = Node Leaf logMessage Leaf
+insert msg(LogMessage _ msgTimeStamp _) node@(Node leftNode treeMessage@(LogMessage _ treeTimeStamp _) rightNode)
+  | msgTimeStamp < treeTimeStamp = Node (insert msg leftNode) treeMessage rightNode
+  | msgTimeStamp > treeTimeStamp = Node leftNode treeMessage (insert msg rightNode)
+  | msgTimeStamp == treeTimeStamp = node
 
