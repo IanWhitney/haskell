@@ -138,7 +138,7 @@ insert _ t = t
 build :: [LogMessage] -> MessageTree
 build [] = Leaf
 build [m] = Node Leaf m Leaf
-build [m:ms] = insert m (build ms)
+build (m:ms) = insert m (build ms)
 
 -- My first pass at Exercise 4
 inOrder :: MessageTree -> [LogMessage]
