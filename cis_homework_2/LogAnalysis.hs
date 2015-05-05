@@ -60,28 +60,29 @@ parse s = map parseMessage (lines s)
 -- (map parseMessage) needs a []
 -- lines provides the []
 --
--- 
+--
 
 -- parse s = map parseMessage $ lines s
 -- map (function) list -> list
 -- lines s resolves to list
 -- the $ means that lines s resolves first.
 
-theTimestamp :: LogMessage -> TimeStamp
-theTimestamp (LogMessage _ t _) = t
-theTimestamp (Unknown _ ) = 0
-
-nodeMessage :: MessageTree -> LogMessage
-nodeMessage (Node _ l _) = l
-nodeMessage _ = Unknown ""
-
-leftNode :: MessageTree -> MessageTree
-leftNode (Node left _ _ ) = left
-
-rightNode :: MessageTree -> MessageTree
-rightNode (Node _ _ right ) = right
 
 -- This was my first pass at the function, which was wrong.
+-- theTimestamp :: LogMessage -> TimeStamp
+-- theTimestamp (LogMessage _ t _) = t
+-- theTimestamp (Unknown _ ) = 0
+--
+-- nodeMessage :: MessageTree -> LogMessage
+-- nodeMessage (Node _ l _) = l
+-- nodeMessage _ = Unknown ""
+--
+-- leftNode :: MessageTree -> MessageTree
+-- leftNode (Node left _ _ ) = left
+--
+-- rightNode :: MessageTree -> MessageTree
+-- rightNode (Node _ _ right ) = right
+--
 -- insert :: LogMessage -> MessageTree -> MessageTree
 -- insert (Unknown _) tree = tree
 -- insert logMessage (Leaf) = Node Leaf logMessage Leaf
